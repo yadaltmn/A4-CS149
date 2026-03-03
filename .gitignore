@@ -2,3 +2,19 @@ src/countnames
 countnames
 countnames
 .DS_Store
+
+# macOS junk
+.DS_Store
+
+# debug symbols
+*.dSYM/
+
+# runtime output files
+*.out
+*.err
+
+# compiled binaries
+shell1
+countnames
+shell
+

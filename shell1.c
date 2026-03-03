@@ -28,6 +28,10 @@ int main(void)
             args[argc++] = tok;
             tok = strtok(NULL, " \t");
             }
+            args[argc] = NULL;
+            if (argc > 0 && (strcmp(args[0], "quit") == 0 || strcmp(args[0], "exit") == 0)) {
+                break;  // exit shell
+            }
             if (argc > 0 && strcmp(args[0], "./countnames") == 0) {
             /* if user typed only ./countnames */
             if (argc == 1) {
@@ -71,7 +75,7 @@ int main(void)
         pid = fork();
 
         if (pid == 0) {
-            execlp(buf, buf, (char *)0);
+            execvp(args[0], args);
             perror("exec");
             _exit(127);
         }

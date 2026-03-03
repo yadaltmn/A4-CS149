@@ -1,4 +1,3 @@
-@@ -1,98 +1,123 @@
 // filepath: /countnames/src/countnames.c
 
 /*
@@ -51,7 +50,7 @@ int main(int argc, char *argv[])
     }
     else if (argc == 1)
     {
-        fp = stdin;
+        return 0;
     }
     else
     {
@@ -79,7 +78,6 @@ int main(int argc, char *argv[])
 
         if (strlen(buffer) == 0)
         {
-            fprintf(stderr, "Warning: Line %d is empty.\n", lineNum);
             if (argc == 2)
             {
                 fprintf(stderr, "Warning - file %s line %d is empty.\n", argv[1], lineNum);

@@ -6,7 +6,7 @@
  * Author emails: 
  * jada-lien.nguyen@sjsu.edu 
  * jesse.mendoza@sjsu.edu 
- * Last modified date: 2/27/2026
+ * Last modified date: 3/03/2026
  * Creation date: 2/27/2026
  **/
 
@@ -15,11 +15,18 @@
 
 ## How to Compile Code:
 
-Navigate to the folder where countnames.c is located, then enter following command in terminal:
+Navigate to the folder where countnames.c and shell1.c is located, then enter following commands in terminal:
 
-gcc -o countnames countnames.c -Wall -Werror
+gcc -Wall -Wextra -g -o countnames countnames.c
+gcc -Wall -Wextra -g -o shell1 shell1.c
 
-## How to run each test case:
+## Run shell
+
+./shell1
+
+### (Can exit shell with 'quit' or 'exit')
+
+## shell1 one file test
 
 ./countnames test/names.txt
 ./countnames test/names1.txt
@@ -34,38 +41,66 @@ gcc -o countnames countnames.c -Wall -Werror
 ./countnames test/testCase2.txt
 ./countnames test/testCase3.txt
 
+## shell1 multiple file test
+
+./countnames test/testCase1.txt test/testCase2.txt test/testCase3.txt
+./countnames test/namesB.txt test/names2.txt
+./countnames test/names_long.txt test/names_long_redundant.txt
+
 ## Output expected for each test case:
 
-./countnames test/names.txt
+## ./countnames test/names.txt
 
-Warning: Line 2 is empty.
-Warning: Line 5 is empty.
+### $PID.err
+
+Warning - file test/names.txt line 2 is empty.
+Warning - file test/names.txt line 5 is empty.
+
+### $PID.out
+
 Nicky: 1
 Dave Joe: 2
 Yuan Cheng Chang: 3
 John Smith: 1
 
-./countnames test/names1.txt
+## ./countnames test/names1.txt
 
-Warning: Line 3 is empty.
+### $PID.err
+
+Warning - file test/names1.txt line 3 is empty.
+
+### $PID.out
+
 Tom Wu: 3
 
-./countnames test/names2.txt
+## ./countnames test/names2.txt
+
+### $PID.err
+
+### $PID.out
 
 Jenn Xu: 2
 Tom Wu: 1
 
-./countnames test/namesB.txt
+## ./countnames test/namesB.txt
 
-Warning: Line 2 is empty.
-Warning: Line 5 is empty.
+### $PID.err
+
+Warning - file test/namesB.txt line 2 is empty.
+Warning - file test/namesB.txt line 5 is empty.
+
+### $PID.out
+
 Nicky: 1
 Dave Joe: 2
 Yuan Cheng Chang: 3
 John Smith: 1
 
+## ./countnames test/names_long.txt
 
-./countnames test/names_long.txt
+### $PID.err
+
+### $PID.out
 
 MARY SMITH: 1
  : 99
@@ -168,7 +203,11 @@ ANNIE RUSSELL: 1
 LILLIAN GRIFFIN: 1
 EMILY DIAZ: 1
 
-./countnames test/names_long_redundant.txt
+## ./countnames test/names_long_redundant.txt
+
+### $PID.err
+
+### $PID.out
 
 John Smith: 1
 Emily Davis: 1
@@ -262,12 +301,17 @@ Nicholas Davis: 1
 Sofia Thompson: 1
 Brandon Brown: 1
 
-./countnames test/names_long_redundant1.txt
+## ./countnames test/names_long_redundant1.txt
 
-Warning: Line 2 is empty.
-Warning: Line 4 is empty.
-Warning: Line 6 is empty.
-Warning: Line 8 is empty.
+### $PID.err
+
+Warning - file test/names_long_redundant1.txt line 2 is empty.
+Warning - file test/names_long_redundant1.txt line 4 is empty.
+Warning - file test/names_long_redundant1.txt line 6 is empty.
+Warning - file test/names_long_redundant1.txt line 8 is empty.
+
+### $PID.out
+
 MARY SMITH: 1
 PATRICIA JOHNSON: 1
 LINDA WILLIAMS: 1
@@ -309,7 +353,11 @@ MARTHA GONZALEZ: 1
 DEBRA NELSON: 1
 AMANDA CARTER: 1
 
-./countnames test/names_long_redundant2.txt
+## ./countnames test/names_long_redundant2.txt
+
+### $PID.err
+
+### $PID.out
 
 STEPHANIE MITCHELL: 1
 CAROLYN PEREZ: 1
@@ -356,7 +404,11 @@ KATHRYN COLEMAN: 1
 LOUISE B JENKINS: 1
 SARA A PERRY: 1
 
-./countnames test/names_long_redundant3.txt
+## ./countnames test/names_long_redundant3.txt
+
+### $PID.err
+
+### $PID.out
 
 ANNE J POWELL: 1
 JACQUELINE K LONG: 1
@@ -400,10 +452,15 @@ SARAH LEWIS: 1
 KIMBERLY LEE: 1
 DEBORAH WALKER: 1
 
-./countnames test/testCase1.txt
+## ./countnames test/testCase1.txt
 
-Warning: Line 4 is empty.
-Warning: Line 6 is empty.
+### $PID.err
+
+Warning - file test/testCase1.txt line 4 is empty.
+Warning - file test/testCase1.txt line 6 is empty
+
+### $PID.out
+
 Mike Lam: 1
 Jimmy Le: 1
 J i m m y L e: 1
@@ -411,12 +468,17 @@ M ike Lam: 1
 JeSsE: 1
 JESSE: 1
 
-./countnames test/testCase2.txt
+## ./countnames test/testCase2.txt
 
-Warning: Line 2 is empty.
-Warning: Line 6 is empty.
-Warning: Line 10 is empty.
-Warning: Line 14 is empty.
+### $PID.err
+
+Warning - file test/testCase2.txt line 2 is empty.
+Warning - file test/testCase2.txt line 6 is empty.
+Warning - file test/testCase2.txt line 10 is empty.
+Warning - file test/testCase2.txt line 14 is empty.
+
+### $PID.out
+
 Jose Mendez: 1
 Ana Nguyen: 2
 Charlie Kirk: 1
@@ -428,12 +490,17 @@ Andrew White: 2
 ANDREW WHITE: 1
 Nguyen Ana: 1
 
-./countnames test/testCase3.txt
+## ./countnames test/testCase3.txt
 
-Warning: Line 6 is empty.
-Warning: Line 10 is empty.
-Warning: Line 13 is empty.
-Warning: Line 16 is empty.
+### $PID.err
+
+Warning - file test/testCase3.txt line 6 is empty.
+Warning - file test/testCase3.txt line 10 is empty.
+Warning - file test/testCase3.txt line 13 is empty.
+Warning - file test/testCase3.txt line 16 is empty.
+
+### $PID.out
+
 ABRAHAM LINCOLN: 1
 ABRAHAM RAMIREZ: 1
  ABRAHAM LINCOLN: 1
@@ -463,11 +530,11 @@ MENDOZA JESSE: 1
 
 ## Lessons Learned
 
-Jada Lien Nguyen-
-This assignment helped me get more comfortable working in C and understanding how programs are structured from start to finish. I practiced handling file input, working with strings in C (which is very different from higher-level languages), and managing memory carefully. It also reinforced how important it is to check for errors, especially when opening files. Overall, it helped me better understand how UNIX-style utilities are built and how small design decisions affect program behavior.
+Jada Lien Nguyen -
 
-Jesse Mendoza - 
-This assignment helped me have a better understanding of C. Understanding how to open and process a txt file was also something I learned, as well as passing a file through the command line. My familiarity with Linux has helped me to have a better understanding of how to manage the filesystems and create new txt files for our 3 new test cases. I also learned how to troubleshoot my program in C when encountering any error / compile issues. Overall, this assignment helped me in building a better foundation.
+
+Jesse Mendoza - This assignment helped me learn fork(), execvp(), wait() by creating child processes for countnames.c. I also learned how to redirect child output into a PID.out and PID.err file. Err file shows what lines were empty while Out file will display the correct intended output of how many lines in each program. Adding quit, exit, and other basic commands to shell1.c helped me to understand how a shell handles commands.
+
 
 ## References
 
