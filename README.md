@@ -1,12 +1,12 @@
 
 /**
- * Description: This program ....
+ * Description: This program implements a UNIX shell (shell1.c). Useer can call ./countnames which will spawn a child per input file. Each child will redirect output to a err and out file with its corresponding PID. err file displays any warnings such as missing line. out will contain how many times a name occured in the text file. 
  * 
  * Author names: Jada-Lien Nguyen and Jesse Mendoza 
  * Author emails: 
  * jada-lien.nguyen@sjsu.edu 
  * jesse.mendoza@sjsu.edu 
- * Last modified date: 3/03/2026
+ * Last modified date: 3/04/2026
  * Creation date: 2/27/2026
  **/
 
