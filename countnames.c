@@ -3,11 +3,11 @@
 /*
  * countnames.c
  * Reads names from a file (or stdin) and prints how many times each name appears.
- * GitHub : https://github.com/jesseemendozaa/Assignment-2?tab=readme-ov-file
+ * GitHub : https://github.com/jesseemendozaa/Assignment-3
  * Author : 
  * Jesse Mendoza 
  * Jada-Lien Nguyen
- * Date modified : 03/04/2026
+ * Date modified : 03/23/2026
  * 
  */
 
@@ -20,9 +20,15 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
-#define MAX_NAMES 100 // 100 distinct names
+#define MAX_NAMES 1000 // 1000 distinct names
 #define MAX_NAME_LENGTH 31
 #define LINE_BUFFER_SIZE 256
+
+typedef struct
+{
+    char name[MAX_NAME_LENGTH];
+    int count;
+} NameCountData;
 
 
 static void redirect(void)
@@ -44,7 +50,7 @@ int main(int argc, char *argv[])
 {
     redirect();
     
-    //If a file name is provvided, attempt to open it 
+    //If a file name is provided, attempt to open it 
     FILE *fp = NULL;
     if (argc == 2)
     {
@@ -125,8 +131,15 @@ int main(int argc, char *argv[])
     //This will print the final results of names and their counts
     for (int i = 0; i < lengthCount; i++)
     {
+        NameCountData data;
+        strncpy(data.name, names[i], MAX_NAME_LENGTH - 1);
+        data.name[MAX_NAME_LENGTH - 1] = '\0';
+        data.count = counts[i];
+
+        write(3, &data, sizeof(NameCountData));
         printf("%s: %d\n", names[i], counts[i]);
     }
 
+    close(3); // 
     return 0;
 }

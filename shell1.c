@@ -1,4 +1,4 @@
-// GitHub : https://github.com/jesseemendozaa/Assignment-2?tab=readme-ov-file
+// GitHub : https://github.com/jesseemendozaa/Assignment-3
 
 // A simple shell program that reads a line of input, parses it into arguments,
 #include <stdio.h>
@@ -9,6 +9,37 @@
 
 // The shell should support the following features:
 #define MAXLINE 1024
+#define MAX_NAMES 1000 // 1000 distinct names
+#define MAX_NAME_LENGTH 31
+
+typedef struct
+{
+    char name[MAX_NAME_LENGTH];
+    int count;
+} NameCountData;
+
+static void merge_name_count(char names[MAX_NAMES][MAX_NAME_LENGTH], int counts[MAX_NAMES], int *lengthCount, const NameCountData *data)
+{
+    int found = 0;
+
+    for (int i = 0; i < *lengthCount; i++)
+    {
+        if (strcmp(names[i], data->name) == 0)
+        {
+            counts[i] += data->count;
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found && *lengthCount < MAX_NAMES)
+    {
+        strncpy(names[*lengthCount], data->name, MAX_NAME_LENGTH - 1);
+        names[*lengthCount][MAX_NAME_LENGTH - 1] = '\0';
+        counts[*lengthCount] = data->count;
+        (*lengthCount)++;
+    }
+}
 
 int main(void)
 {
@@ -33,6 +64,13 @@ int main(void)
             tok = strtok(NULL, " \t");     // get the next token
             }
             args[argc] = NULL;
+
+            if (argc == 0)
+            {
+                printf("%% ");
+                continue;
+            }
+
             // If the user types "quit" or "exit", the shell should exit.
             if (argc > 0 && (strcmp(args[0], "quit") == 0 || strcmp(args[0], "exit") == 0)) {
                 break;  // exit shell
@@ -55,6 +93,27 @@ int main(void)
             printf("%% ");
             continue;
             }
+
+            int fd[2];
+            if (pipe(fd) == -1) 
+            {
+                perror("pipe");
+                printf("%% ");
+                continue;
+            }
+
+            char finalNames[MAX_NAMES][MAX_NAME_LENGTH];
+            int finalCounts[MAX_NAMES];
+            int finalLengthCount = 0;
+            pid_t children[128];
+            int num_children = 0;
+
+            for (int i = 0; i < MAX_NAMES; i++)
+            {
+                finalNames[i][0] = '\0';
+                finalCounts[i] = 0;
+            }
+
             // if user typed ./countnames with arguments, fork a child process for each argument and execute countnames with that argument
             for (int i = 1; i < argc; i++) {
                 pid = fork();
@@ -63,16 +122,54 @@ int main(void)
                     continue;
                 }
                 // In the child process, execute countnames with the argument
-                if (pid == 0) {
+                if (pid == 0) 
+                {
+                    close(fd[0]);
+
+                    if (fd[1] != 3) 
+                    {
+                        if (dup2(fd[1], 3) == -1) 
+                        {
+                            perror("dup2");
+                            _exit(127);
+                        }
+                    }
+                    close(fd[1]);
+                    
                     execlp("./countnames", "./countnames", args[i], (char *)0);
                     perror("exec");
                     _exit(127);
                     }
+                    else
+                    {
+                        children[num_children++] = pid;
+                    }
             }
-            // In the parent process, wait for all child processes to finish
-            for (int i = 1; i < argc; i++) {
-                wait(&status);
+
+            close(fd[1]);
+
+            NameCountData data;
+            ssize_t BR;
+
+            while((BR = read(fd[0], &data, sizeof(NameCountData))) > 0) 
+            {
+                if(BR == (ssize_t)sizeof(NameCountData))
+                {
+                    merge_name_count(finalNames, finalCounts, &finalLengthCount, &data);
                 }
+            }
+
+            close(fd[0]);
+
+            for (int i = 0; i < num_children; i++) 
+            {
+                waitpid(children[i], &status, 0);
+            }
+
+            for (int i = 0; i < finalLengthCount; i++)
+            {
+                printf("%s: %d\n", finalNames[i], finalCounts[i]);
+            }
 
             printf("%% ");
             continue;

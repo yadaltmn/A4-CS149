@@ -1,7 +1,7 @@
 
 /**
- * Description: This program implements a UNIX shell (shell1.c). Useer can call ./countnames which will spawn a child per input file. Each child will redirect output to a err and out file with its corresponding PID. err file displays any warnings such as missing line. out will contain how many times a name occured in the text file. 
- * GitHub : https://github.com/jesseemendozaa/Assignment-2?tab=readme-ov-file
+ * Description: This program implements a UNIX shell (shell1.c). User can call ./countnames which will spawn a child per input file. Each child will redirect output to a err and out file with its corresponding PID. err file displays any warnings such as missing line. out will contain how many times a name occured in the text file. In Assignment 3, the children send name counts back to the parent through a pipe and the parent prints the final combined counts of names.
+ * GitHub : https://github.com/jesseemendozaa/Assignment-3
  * 
  * Author names: 
  * Jada-Lien Nguyen -
@@ -9,13 +9,13 @@
  * Author emails: 
  * jada-lien.nguyen@sjsu.edu 
  * jesse.mendoza@sjsu.edu 
- * Last modified date: 3/04/2026
- * Creation date: 2/27/2026
+ * Last modified date: 3/23/2026
+ * Creation date: 3/23/2026
  **/
 
  ## Link to Output of PDF:
 
-https://docs.google.com/document/d/1pEEXwZla7VuK2BYxVjUISSJL8lCjVICLZZdLX5C2hH4/edit?usp=sharing
+[Jada put link here please]
 
 ## How to Compile Code:
 
@@ -45,13 +45,515 @@ gcc -Wall -Wextra -g -o shell1 shell1.c
 ./countnames test/testCase2.txt
 ./countnames test/testCase3.txt
 
-## shell1 multiple file test
+## shell1 multiple file test (expected output below...)
 
-./countnames test/testCase1.txt test/testCase2.txt test/testCase3.txt
-./countnames test/namesB.txt test/names2.txt
-./countnames test/names_long.txt test/names_long_redundant.txt
+./countnames test/names.txt test/names1.txt
+./countnames test/names.txt test/names2.txt
+./countnames test/names1.txt test/names2.txt
+./countnames test/names.txt test/names1.txt test/names2.txt
+./countnames test/names.txt test/namesB.txt
+./countnames test/testCase1.txt test/names1.txt
+./countnames test/testCase1.txt test/names2.txt
+./countnames test/testCase2.txt test/namesB.txt
+./countnames test/testCase3.txt test/names.txt
+./countnames test/testCase1.txt test/testCase3.txt
+./countnames test/names_long_redundant1.txt test/names_long_redundant2.txt
+./countnames test/names_long_redundant2.txt test/names_long_redundant3.txt
+./countnames test/names_long_redundant1.txt test/names_long_redundant3.txt
+./countnames test/names_long_redundant1.txt test/names_long_redundant2.txt test/names_long_redundant3.txt
+./countnames test/names.txt test/testCase1.txt test/testCase2.txt
+./countnames test/namesB.txt test/testCase1.txt test/names2.txt
 
 ## Output expected for each test case:
+
+## ./countnames test/names.txt test/names1.txt
+
+Tom Wu: 3
+Nicky: 1
+Dave Joe: 2
+Yuan Cheng Chang: 3
+John Smith: 1
+
+## ./countnames test/names.txt test/names2.txt
+
+Jenn Xu: 2
+Tom Wu: 1
+Nicky: 1
+Dave Joe: 2
+Yuan Cheng Chang: 3
+John Smith: 1
+
+## ./countnames test/names1.txt test/names2.txt
+
+Jenn Xu: 2
+Tom Wu: 4
+
+## ./countnames test/names.txt test/names1.txt test/names2.txt
+
+Jenn Xu: 2
+Tom Wu: 4
+Nicky: 1
+Dave Joe: 2
+Yuan Cheng Chang: 3
+John Smith: 1
+
+## ./countnames test/names.txt test/namesB.txt
+
+Nicky: 2
+Dave Joe: 4
+Yuan Cheng Chang: 6
+John Smith: 2
+
+## ./countnames test/testCase1.txt test/names1.txt
+
+Tom Wu: 3
+Mike Lam: 1
+Jimmy Le: 1
+J i m m y L e: 1
+M ike Lam: 1
+JeSsE: 1
+JESSE: 1
+
+## ./countnames test/testCase1.txt test/names2.txt
+
+Mike Lam: 1
+Jimmy Le: 1
+J i m m y L e: 1
+M ike Lam: 1
+JeSsE: 1
+JESSE: 1
+Jenn Xu: 2
+Tom Wu: 1
+
+## ./countnames test/testCase2.txt test/namesB.txt
+
+Nicky: 1
+Dave Joe: 2
+Yuan Cheng Chang: 3
+John Smith: 1
+Jose Mendez: 1
+Ana Nguyen: 2
+Charlie Kirk: 1
+Barrack Obama: 1
+Tommy Obama: 1
+ : 1
+ Tim Tran: 1
+Andrew White: 2
+ANDREW WHITE: 1
+Nguyen Ana: 1
+
+## ./countnames test/testCase3.txt test/names.txt
+
+ABRAHAM LINCOLN: 1
+ABRAHAM RAMIREZ: 1
+ ABRAHAM LINCOLN: 1
+ADRIAN ADRIAN: 1
+ADRIAN: 1
+JADA NGUYEn: 1
+GEORGE WASHINGTON: 2
+JADA NGUYEN: 1
+JORGE PEREZ: 1
+JESSE MENDOZA: 1
+MENDOZA JESSE: 1
+Nicky: 1
+Dave Joe: 2
+Yuan Cheng Chang: 3
+John Smith: 1
+
+## ./countnames test/testCase1.txt test/testCase3.txt
+
+ABRAHAM LINCOLN: 1
+ABRAHAM RAMIREZ: 1
+ ABRAHAM LINCOLN: 1
+ADRIAN ADRIAN: 1
+ADRIAN: 1
+JADA NGUYEn: 1
+GEORGE WASHINGTON: 2
+JADA NGUYEN: 1
+JORGE PEREZ: 1
+JESSE MENDOZA: 1
+MENDOZA JESSE: 1
+Mike Lam: 1
+Jimmy Le: 1
+J i m m y L e: 1
+M ike Lam: 1
+JeSsE: 1
+JESSE: 1
+
+## ./countnames test/names_long_redundant1.txt test/names_long_redundant2.txt
+
+STEPHANIE MITCHELL: 1
+CAROLYN PEREZ: 1
+CHRISTINE ROBERTS: 1
+MARIE TURNER: 1
+JANET PHILLIPS: 1
+CATHERINE CAMPBELL: 1
+FRANCES PARKER: 1
+ANN EVANS: 1
+JOYCE EDWARDS: 1
+DIANE COLLINS: 1
+ALICE STEWART: 1
+JULIE SANCHEZ: 1
+HEATHER MORRIS: 1
+TERESA ROGERS: 1
+DORIS REED: 1
+GLORIA COOK: 1
+EVELYN MORGAN: 1
+JEAN BELL: 1
+CHERYL MURPHY: 1
+MILDRED BAILEY: 1
+KATHERINE RIVERA: 1
+JOAN COOPER: 1
+ASHLEY RICHARDSON: 1
+JUDITH COX: 1
+ROSE HOWARD: 1
+JANICE WARD: 1
+KELLY TORRES: 1
+NICOLE PETERSON: 1
+JUDY GRAY: 1
+CHRISTINA RAMIREZ: 1
+KATHY JAMES: 1
+THERESA WATSON: 1
+BEVERLY BROOKS: 1
+DENISE KELLY: 1
+TAMMY SANDERS: 1
+IRENE PRICE: 1
+JANE BENNETT: 1
+LORI WOOD: 1
+RACHEL BARNES: 1
+MARILYN ROSS: 1
+ANDREA HENDERSON: 1
+KATHRYN COLEMAN: 1
+LOUISE B JENKINS: 1
+SARA A PERRY: 1
+MARY SMITH: 1
+PATRICIA JOHNSON: 1
+LINDA WILLIAMS: 1
+BARBARA JONES: 1
+ELIZABETH BROWN: 1
+JENNIFER DAVIS: 1
+MARIA MILLER: 1
+SUSAN WILSON: 1
+MARGARET MOORE: 1
+DOROTHY TAYLOR: 1
+LISA ANDERSON: 1
+NANCY THOMAS: 1
+KAREN JACKSON: 1
+BETTY WHITE: 1
+HELEN HARRIS: 1
+SANDRA MARTIN: 1
+DONNA THOMPSON: 1
+CAROL GARCIA: 1
+RUTH MARTINEZ: 1
+SHARON ROBINSON: 1
+MICHELLE CLARK: 1
+LAURA RODRIGUEZ: 1
+SARAH LEWIS: 1
+KIMBERLY LEE: 1
+DEBORAH WALKER: 1
+JESSICA HALL: 1
+SHIRLEY ALLEN: 1
+CYNTHIA YOUNG: 1
+ANGELA HERNANDEZ: 1
+MELISSA KING: 1
+BRENDA WRIGHT: 1
+AMY LOPEZ: 1
+ANNA HILL: 1
+REBECCA SCOTT: 1
+VIRGINIA GREEN: 1
+KATHLEEN ADAMS: 1
+PAMELA BAKER: 1
+MARTHA GONZALEZ: 1
+DEBRA NELSON: 1
+AMANDA CARTER: 1
+
+## ./countnames test/names_long_redundant2.txt test/names_long_redundant3.txt
+
+ANNE J POWELL: 1
+JACQUELINE K LONG: 1
+WANDA M PATTERSON: 1
+BONNIE HUGHES: 1
+STEPHANIE MITCHELL: 1
+CAROLYN PEREZ: 1
+CHRISTINE ROBERTS: 1
+JULIA FLORES: 1
+RUBY WASHINGTON: 1
+LOIS BUTLER: 1
+TINA SIMMONS: 1
+MARIE TURNER: 1
+PHYLLIS FOSTER: 1
+NORMA GONZALES: 1
+PAULA BRYANT: 1
+DIANA ALEXANDER: 1
+JANET PHILLIPS: 1
+ANNIE RUSSELL: 1
+LILLIAN GRIFFIN: 1
+EMILY DIAZ: 1
+CATHERINE CAMPBELL: 1
+FRANCES PARKER: 1
+ANN EVANS: 1
+JOYCE EDWARDS: 1
+ROBIN HAYES: 1
+DIANE COLLINS: 1
+ALICE STEWART: 1
+JULIE SANCHEZ: 1
+MARY SMITH: 2
+PATRICIA JOHNSON: 2
+LINDA WILLIAMS: 2
+BARBARA JONES: 2
+ELIZABETH BROWN: 2
+HEATHER MORRIS: 1
+JENNIFER DAVIS: 1
+MARIA MILLER: 1
+TERESA ROGERS: 1
+SUSAN WILSON: 1
+MARGARET MOORE: 1
+DOROTHY TAYLOR: 1
+LISA ANDERSON: 1
+NANCY THOMAS: 1
+KAREN JACKSON: 1
+BETTY WHITE: 1
+DORIS REED: 1
+HELEN HARRIS: 1
+GLORIA COOK: 1
+EVELYN MORGAN: 1
+JEAN BELL: 1
+CHERYL MURPHY: 1
+SANDRA MARTIN: 1
+MILDRED BAILEY: 1
+DONNA THOMPSON: 1
+CAROL GARCIA: 1
+RUTH MARTINEZ: 1
+SHARON ROBINSON: 1
+MICHELLE CLARK: 1
+LAURA RODRIGUEZ: 1
+SARAH LEWIS: 1
+KIMBERLY LEE: 1
+DEBORAH WALKER: 1
+KATHERINE RIVERA: 1
+JOAN COOPER: 1
+ASHLEY RICHARDSON: 1
+JUDITH COX: 1
+ROSE HOWARD: 1
+JANICE WARD: 1
+KELLY TORRES: 1
+NICOLE PETERSON: 1
+JUDY GRAY: 1
+CHRISTINA RAMIREZ: 1
+KATHY JAMES: 1
+THERESA WATSON: 1
+BEVERLY BROOKS: 1
+DENISE KELLY: 1
+TAMMY SANDERS: 1
+IRENE PRICE: 1
+JANE BENNETT: 1
+LORI WOOD: 1
+RACHEL BARNES: 1
+MARILYN ROSS: 1
+ANDREA HENDERSON: 1
+KATHRYN COLEMAN: 1
+LOUISE B JENKINS: 1
+SARA A PERRY: 1
+
+## ./countnames test/names_long_redundant1.txt test/names_long_redundant3.txt
+
+ANNE J POWELL: 1
+JACQUELINE K LONG: 1
+WANDA M PATTERSON: 1
+BONNIE HUGHES: 1
+JULIA FLORES: 1
+RUBY WASHINGTON: 1
+LOIS BUTLER: 1
+TINA SIMMONS: 1
+PHYLLIS FOSTER: 1
+NORMA GONZALES: 1
+PAULA BRYANT: 1
+DIANA ALEXANDER: 1
+ANNIE RUSSELL: 1
+LILLIAN GRIFFIN: 1
+EMILY DIAZ: 1
+ROBIN HAYES: 1
+MARY SMITH: 3
+PATRICIA JOHNSON: 3
+LINDA WILLIAMS: 3
+BARBARA JONES: 3
+ELIZABETH BROWN: 3
+JENNIFER DAVIS: 2
+MARIA MILLER: 2
+SUSAN WILSON: 2
+MARGARET MOORE: 2
+DOROTHY TAYLOR: 2
+LISA ANDERSON: 2
+NANCY THOMAS: 2
+KAREN JACKSON: 2
+BETTY WHITE: 2
+HELEN HARRIS: 2
+SANDRA MARTIN: 2
+DONNA THOMPSON: 2
+CAROL GARCIA: 2
+RUTH MARTINEZ: 2
+SHARON ROBINSON: 2
+MICHELLE CLARK: 2
+LAURA RODRIGUEZ: 2
+SARAH LEWIS: 2
+KIMBERLY LEE: 2
+DEBORAH WALKER: 2
+JESSICA HALL: 1
+SHIRLEY ALLEN: 1
+CYNTHIA YOUNG: 1
+ANGELA HERNANDEZ: 1
+MELISSA KING: 1
+BRENDA WRIGHT: 1
+AMY LOPEZ: 1
+ANNA HILL: 1
+REBECCA SCOTT: 1
+VIRGINIA GREEN: 1
+KATHLEEN ADAMS: 1
+PAMELA BAKER: 1
+MARTHA GONZALEZ: 1
+DEBRA NELSON: 1
+AMANDA CARTER: 1
+
+## ./countnames test/names_long_redundant1.txt test/names_long_redundant2.txt test/names_long_redundant3.txt
+
+STEPHANIE MITCHELL: 1
+ANNE J POWELL: 1
+CAROLYN PEREZ: 1
+JACQUELINE K LONG: 1
+CHRISTINE ROBERTS: 1
+WANDA M PATTERSON: 1
+MARIE TURNER: 1
+BONNIE HUGHES: 1
+JANET PHILLIPS: 1
+JULIA FLORES: 1
+CATHERINE CAMPBELL: 1
+RUBY WASHINGTON: 1
+FRANCES PARKER: 1
+LOIS BUTLER: 1
+ANN EVANS: 1
+JOYCE EDWARDS: 1
+DIANE COLLINS: 1
+ALICE STEWART: 1
+JULIE SANCHEZ: 1
+TINA SIMMONS: 1
+HEATHER MORRIS: 1
+PHYLLIS FOSTER: 1
+TERESA ROGERS: 1
+DORIS REED: 1
+GLORIA COOK: 1
+EVELYN MORGAN: 1
+JEAN BELL: 1
+NORMA GONZALES: 1
+CHERYL MURPHY: 1
+PAULA BRYANT: 1
+MILDRED BAILEY: 1
+DIANA ALEXANDER: 1
+KATHERINE RIVERA: 1
+JOAN COOPER: 1
+ASHLEY RICHARDSON: 1
+JUDITH COX: 1
+ROSE HOWARD: 1
+JANICE WARD: 1
+ANNIE RUSSELL: 1
+KELLY TORRES: 1
+NICOLE PETERSON: 1
+JUDY GRAY: 1
+CHRISTINA RAMIREZ: 1
+LILLIAN GRIFFIN: 1
+KATHY JAMES: 1
+THERESA WATSON: 1
+EMILY DIAZ: 1
+BEVERLY BROOKS: 1
+ROBIN HAYES: 1
+DENISE KELLY: 1
+MARY SMITH: 3
+TAMMY SANDERS: 1
+PATRICIA JOHNSON: 3
+IRENE PRICE: 1
+LINDA WILLIAMS: 3
+JANE BENNETT: 1
+BARBARA JONES: 3
+LORI WOOD: 1
+ELIZABETH BROWN: 3
+RACHEL BARNES: 1
+JENNIFER DAVIS: 2
+MARILYN ROSS: 1
+MARIA MILLER: 2
+SUSAN WILSON: 2
+MARGARET MOORE: 2
+DOROTHY TAYLOR: 2
+LISA ANDERSON: 2
+NANCY THOMAS: 2
+KAREN JACKSON: 2
+BETTY WHITE: 2
+ANDREA HENDERSON: 1
+HELEN HARRIS: 2
+KATHRYN COLEMAN: 1
+SANDRA MARTIN: 2
+LOUISE B JENKINS: 1
+DONNA THOMPSON: 2
+SARA A PERRY: 1
+CAROL GARCIA: 2
+RUTH MARTINEZ: 2
+SHARON ROBINSON: 2
+MICHELLE CLARK: 2
+LAURA RODRIGUEZ: 2
+SARAH LEWIS: 2
+KIMBERLY LEE: 2
+DEBORAH WALKER: 2
+JESSICA HALL: 1
+SHIRLEY ALLEN: 1
+CYNTHIA YOUNG: 1
+ANGELA HERNANDEZ: 1
+MELISSA KING: 1
+BRENDA WRIGHT: 1
+AMY LOPEZ: 1
+ANNA HILL: 1
+REBECCA SCOTT: 1
+VIRGINIA GREEN: 1
+KATHLEEN ADAMS: 1
+PAMELA BAKER: 1
+MARTHA GONZALEZ: 1
+DEBRA NELSON: 1
+AMANDA CARTER: 1
+
+## ./countnames test/names.txt test/testCase1.txt test/testCase2.txt
+
+Nicky: 1
+Dave Joe: 2
+Yuan Cheng Chang: 3
+John Smith: 1
+Mike Lam: 1
+Jimmy Le: 1
+J i m m y L e: 1
+M ike Lam: 1
+JeSsE: 1
+JESSE: 1
+Jose Mendez: 1
+Ana Nguyen: 2
+Charlie Kirk: 1
+Barrack Obama: 1
+Tommy Obama: 1
+ : 1
+ Tim Tran: 1
+Andrew White: 2
+ANDREW WHITE: 1
+Nguyen Ana: 1
+
+## ./countnames test/namesB.txt test/testCase1.txt test/names2.txt
+
+Jenn Xu: 2
+Tom Wu: 1
+Mike Lam: 1
+Jimmy Le: 1
+J i m m y L e: 1
+M ike Lam: 1
+JeSsE: 1
+JESSE: 1
+Nicky: 1
+Dave Joe: 2
+Yuan Cheng Chang: 3
+John Smith: 1
 
 ## ./countnames test/names.txt
 
@@ -534,10 +1036,10 @@ MENDOZA JESSE: 1
 
 ## Lessons Learned
 
-Jada Lien Nguyen - This assignment helped me understand how a UNIX shell executes programs using fork(), execvp(), and wait(). I learned how to create child processes for countnames.c and how to redirect output into PID.out and PID.err files. I also improved my debugging skills by testing different edge cases (empty lines, duplicate names, long inputs, and whitespace). Overall, documenting functions and writing a complete README made me more comfortable with writing clean, readable C code that other people can run and verify.
+Jada Lien Nguyen - 
 
 
-Jesse Mendoza - This assignment helped me learn fork(), execvp(), wait() by creating child processes for countnames.c. I also learned how to redirect child output into a PID.out and PID.err file. Err file shows what lines were empty while Out file will display the correct intended output of how many lines in each program. Adding quit, exit, and other basic commands to shell1.c helped me to understand how a shell handles commands.
+Jesse Mendoza - This assignment helped me learn fork(), execvp(), wait(), pipe(), and dup2(). I learned how the child processes can send data back to the parent through pipes, how the parent can merge the results from children, and how .err and .out files are created.
 
 
 ## References
