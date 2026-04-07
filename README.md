@@ -61,7 +61,7 @@ exit
 
 ## Implementation Summary
 
-- `shell.c` creates a large shared memory region using `mmap()`.
+- `shell.c` creates a large file-backed shared memory region using `mmap()`.
 - The shared memory is divided into one region per child plus one summary region for the parent.
 - Each child processes one file and writes its `NameCountData` array into only its assigned subspace.
 - Each child region ends when a record has `name[0] == '\0'`.
@@ -115,11 +115,11 @@ What it tests:
 Expected final output:
 
 ```text
-Tom Wu: 3
 Nicky: 1
 Dave Joe: 2
 Yuan Cheng Chang: 3
 John Smith: 1
+Tom Wu: 3
 ```
 
 ### Test 3
@@ -140,10 +140,6 @@ What it tests:
 Expected final output:
 
 ```text
-Nicky: 1
-Dave Joe: 2
-Yuan Cheng Chang: 3
-John Smith: 1
 Jose Mendez: 1
 Ana Nguyen: 2
 Charlie Kirk: 1
@@ -154,6 +150,10 @@ Tommy Obama: 1
 Andrew White: 2
 ANDREW WHITE: 1
 Nguyen Ana: 1
+Nicky: 1
+Dave Joe: 2
+Yuan Cheng Chang: 3
+John Smith: 1
 ```
 
 ### Test 4
@@ -174,6 +174,12 @@ What it tests:
 Expected final output:
 
 ```text
+Mike Lam: 1
+Jimmy Le: 1
+J i m m y L e: 1
+M ike Lam: 1
+JeSsE: 1
+JESSE: 1
 ABRAHAM LINCOLN: 1
 ABRAHAM RAMIREZ: 1
  ABRAHAM LINCOLN: 1
@@ -185,12 +191,6 @@ JADA NGUYEN: 1
 JORGE PEREZ: 1
 JESSE MENDOZA: 1
 MENDOZA JESSE: 1
-Mike Lam: 1
-Jimmy Le: 1
-J i m m y L e: 1
-M ike Lam: 1
-JeSsE: 1
-JESSE: 1
 ```
 
 ## Test Files and Edge Cases

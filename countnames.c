@@ -135,6 +135,7 @@ static int write_results_to_shared_memory(const char *filename, const char *shm_
         return 1;
     }
 
+    // Reconnect to the child's assigned subspace inside the parent's GLOBAL region.
     child_region = (NameCountData *)((char *)global_region + offset_bytes);
     count_file_into_region(filename, child_region, MAX_NAMES + 1);
     print_region(child_region, MAX_NAMES + 1);

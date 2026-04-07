@@ -107,6 +107,7 @@ static int run_countnames_parallel(char *args[], int argc)
         return 1;
     }
 
+    // GLOBAL is laid out as one region per child followed by one summary region.
     memset(global, 0, total_bytes);
     summary_region = (NameCountData *)((char *)global + ((size_t)child_count * region_bytes));
     initialize_region(summary_region, region_capacity);
@@ -127,6 +128,7 @@ static int run_countnames_parallel(char *args[], int argc)
             char offset_buffer[32];
             size_t offset = (size_t)i * region_bytes;
 
+            // Each child reconnects to GLOBAL and writes only into its assigned subspace.
             snprintf(offset_buffer, sizeof(offset_buffer), "%zu", offset);
             execl("./countnames", "./countnames", args[i + 1], "--shm", shm_template, offset_buffer, (char *)NULL);
             perror("exec");
@@ -152,6 +154,7 @@ static int run_countnames_parallel(char *args[], int argc)
     for (int i = 0; i < child_count; i++)
     {
         NameCountData *child_region = (NameCountData *)((char *)global + ((size_t)i * region_bytes));
+        // Parent aggregates every child region into the final summary region.
         aggregate_child_region(summary_region, region_capacity, child_region);
     }
 
