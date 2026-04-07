@@ -1,26 +1,18 @@
-// filepath: /countnames/src/countnames.c
-
 /*
  * countnames.c
- * Reads names from a file (or stdin) and prints how many times each name appears.
- * GitHub : https://github.com/jesseemendozaa/Assignment-3
- * Author : 
- * Jesse Mendoza 
- * Jada-Lien Nguyen
- * Date modified : 03/23/2026
- * 
+ * Reads one file of names, writes PID.out / PID.err logs, and optionally
+ * stores the computed name counts into a shared-memory region for shell.c.
  */
 
-
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include <sys/mman.h>
 #include <sys/stat.h>
-#include <sys/wait.h>
+#include <unistd.h>
 
-#define MAX_NAMES 1000 // 1000 distinct names
+#define MAX_NAMES 1000
 #define MAX_NAME_LENGTH 31
 #define LINE_BUFFER_SIZE 256
 
@@ -30,138 +22,154 @@ typedef struct
     int count;
 } NameCountData;
 
-typedef enum
+static void redirect_output(void)
 {
-    TYPE_NAMECOUNT = 1,
-    TYPE_B
-} MessageType;
+    char out_name[64];
+    char err_name[64];
 
-typedef struct
-{
-    MessageType type;
-    size_t size;
-} MessageHeader;
-
-typedef struct
-{
-    MessageHeader header;
-    NameCountData data;
-} NameCountMessage;
-
-
-// Redirect stdout/stderr so each child leaves behind its own .out and .err logs.
-static void redirect(void)
-{
-    char out[64];
-    char errName[64];
-
-    snprintf(out, sizeof(out), "%d.out", getpid());
-    snprintf(errName, sizeof(errName), "%d.err", getpid());
+    snprintf(out_name, sizeof(out_name), "%d.out", getpid());
+    snprintf(err_name, sizeof(err_name), "%d.err", getpid());
 
     close(STDOUT_FILENO);
-    open(out, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+    open(out_name, O_WRONLY | O_CREAT | O_TRUNC, 0777);
 
     close(STDERR_FILENO);
-    open(errName, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+    open(err_name, O_WRONLY | O_CREAT | O_TRUNC, 0777);
 }
 
-int main(int argc, char *argv[])
+static void initialize_region(NameCountData *region, int capacity)
 {
-    redirect();
-    
-    //If a file name is provided, attempt to open it 
-    FILE *fp = NULL;
-    if (argc == 2)
+    for (int i = 0; i < capacity; i++)
     {
-        fp = fopen(argv[1], "r");
-        if (fp == NULL)
-        {
-            fprintf(stderr, "error: cannot open file %s\n", argv[1]);
-            return 1;
-        }
+        region[i].name[0] = '\0';
+        region[i].count = 0;
     }
-    else if (argc == 1)
+}
+
+static void count_file_into_region(const char *filename, NameCountData *region, int capacity)
+{
+    FILE *fp = fopen(filename, "r");
+    char buffer[LINE_BUFFER_SIZE];
+    int length_count = 0;
+    int line_num = 0;
+
+    if (fp == NULL)
     {
-        return 0;
-    }
-    else
-    {
-        return 0;
+        fprintf(stderr, "error: cannot open file %s\n", filename);
+        return;
     }
 
-    // Initialize the names and counts arrays
-    char names[MAX_NAMES][MAX_NAME_LENGTH];
-    int counts[MAX_NAMES];
-    int lengthCount = 0;
-    // Set all counts to 0 and names to empty strings
-    for (int i = 0; i < MAX_NAMES; i++)
+    initialize_region(region, capacity);
+
+    while (fgets(buffer, sizeof(buffer), fp) != NULL)
     {
-        counts[i] = 0;
-        names[i][0] = '\0'; // Initialize the first character to null terminator to indicate an empty string
-    }
-    // Read the file line by line and process the names
-    char buffer[LINE_BUFFER_SIZE];
-    int lineNum = 0;
-    // Read each line from the file until EOF
-    while (fgets(buffer, LINE_BUFFER_SIZE, fp) != NULL)
-    {
-        lineNum++;
-        // Remove newline character if present
+        int found = 0;
+
+        line_num++;
         buffer[strcspn(buffer, "\n")] = '\0';
 
-        if (strlen(buffer) == 0)    // Check if the line is empty
+        if (strlen(buffer) == 0)
         {
-            if (argc == 2)
-            {
-                fprintf(stderr, "Warning - file %s line %d is empty.\n", argv[1], lineNum);  // Print a warning message to stderr if the line is empty
-            }
-            continue; // Skip empty lines
+            fprintf(stderr, "Warning - file %s line %d is empty.\n", filename, line_num);
+            continue;
         }
 
-        // Check if the name is already in the table
-        int found = 0;
-        for (int i = 0; i < lengthCount; i++) // Loop through the existing names to check for a match
+        for (int i = 0; i < length_count; i++)
         {
-            if (strcmp(names[i], buffer) == 0)  // If a match is found, increment the count for that name
+            if (strcmp(region[i].name, buffer) == 0)
             {
-                counts[i]++;
-                found = 1;  // Set found to 1 to indicate that the name was found in the table
+                region[i].count++;
+                found = 1;
                 break;
             }
         }
 
-        // If not found, add it to the table
-        if (!found && lengthCount < MAX_NAMES)
+        if (!found && length_count < capacity - 1)
         {
-            strncpy(names[lengthCount], buffer, MAX_NAME_LENGTH - 1);
-            names[lengthCount][MAX_NAME_LENGTH - 1] = '\0'; // Ensure null-termination
-            counts[lengthCount] = 1;
-            lengthCount++;
-            //increment the count of distinct names
+            strncpy(region[length_count].name, buffer, MAX_NAME_LENGTH - 1);
+            region[length_count].name[MAX_NAME_LENGTH - 1] = '\0';
+            region[length_count].count = 1;
+            length_count++;
+            region[length_count].name[0] = '\0';
+            region[length_count].count = 0;
         }
     }
-    // Close the file after reading
-    if (fp != stdin)
+
+    fclose(fp);
+}
+
+static void print_region(const NameCountData *region, int capacity)
+{
+    for (int i = 0; i < capacity && region[i].name[0] != '\0'; i++)
     {
-        fclose(fp);
+        printf("%s: %d\n", region[i].name, region[i].count);
+    }
+}
+
+static int write_results_to_shared_memory(const char *filename, const char *shm_path, long offset_bytes)
+{
+    int fd;
+    struct stat sb;
+    void *global_region;
+    NameCountData *child_region;
+
+    fd = open(shm_path, O_RDWR);
+    if (fd == -1)
+    {
+        fprintf(stderr, "error: cannot open shared memory file %s\n", shm_path);
+        return 1;
     }
 
-
-    //This will print the final results of names and their counts
-    for (int i = 0; i < lengthCount; i++)
+    if (fstat(fd, &sb) == -1)
     {
-        NameCountMessage message;
-        message.header.type = TYPE_NAMECOUNT;
-        message.header.size = sizeof(NameCountData);
-        strncpy(message.data.name, names[i], MAX_NAME_LENGTH - 1);
-        message.data.name[MAX_NAME_LENGTH - 1] = '\0';
-        message.data.count = counts[i];
-
-        // Send header and payload together so one child's message cannot be split apart.
-        write(3, &message, sizeof(NameCountMessage));
-        printf("%s: %d\n", names[i], counts[i]);
+        fprintf(stderr, "error: cannot stat shared memory file %s\n", shm_path);
+        close(fd);
+        return 1;
     }
 
-    close(3); // Close the pipe endpoint inherited from shell1.
+    global_region = mmap(NULL, (size_t)sb.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (global_region == MAP_FAILED)
+    {
+        fprintf(stderr, "error: mmap failed for shared memory file %s\n", shm_path);
+        close(fd);
+        return 1;
+    }
+
+    child_region = (NameCountData *)((char *)global_region + offset_bytes);
+    count_file_into_region(filename, child_region, MAX_NAMES + 1);
+    print_region(child_region, MAX_NAMES + 1);
+
+    munmap(global_region, (size_t)sb.st_size);
+    close(fd);
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    NameCountData local_region[MAX_NAMES + 1];
+
+    redirect_output();
+
+    if (argc == 2)
+    {
+        count_file_into_region(argv[1], local_region, MAX_NAMES + 1);
+        print_region(local_region, MAX_NAMES + 1);
+        return 0;
+    }
+
+    if (argc == 5 && strcmp(argv[2], "--shm") == 0)
+    {
+        char *endptr = NULL;
+        long offset_bytes = strtol(argv[4], &endptr, 10);
+
+        if (endptr == NULL || *endptr != '\0' || offset_bytes < 0)
+        {
+            fprintf(stderr, "error: invalid shared memory offset %s\n", argv[4]);
+            return 1;
+        }
+
+        return write_results_to_shared_memory(argv[1], argv[3], offset_bytes);
+    }
+
     return 0;
 }
