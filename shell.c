@@ -24,6 +24,7 @@ typedef struct
     int count;
 } NameCountData;
 
+// Make all entries empty
 static void initialize_region(NameCountData *region, int capacity)
 {
     for (int i = 0; i < capacity; i++)
@@ -33,6 +34,7 @@ static void initialize_region(NameCountData *region, int capacity)
     }
 }
 
+// Merge this entry into the summary region
 static void merge_name_count(NameCountData *summary_region, int capacity, const NameCountData *entry)
 {
     for (int i = 0; i < capacity - 1; i++)
@@ -55,14 +57,17 @@ static void merge_name_count(NameCountData *summary_region, int capacity, const 
     }
 }
 
+// Add this child's counts to the summary region
 static void aggregate_child_region(NameCountData *summary_region, int capacity, const NameCountData *child_region)
 {
+    // Empty name means stop here.
     for (int i = 0; i < capacity && child_region[i].name[0] != '\0'; i++)
     {
         merge_name_count(summary_region, capacity, &child_region[i]);
     }
 }
 
+// Print the name counts in this region
 static void print_region(const NameCountData *region, int capacity)
 {
     for (int i = 0; i < capacity && region[i].name[0] != '\0'; i++)
@@ -71,6 +76,7 @@ static void print_region(const NameCountData *region, int capacity)
     }
 }
 
+// Run countnames in parallel using shared memory
 static int run_countnames_parallel(char *args[], int argc)
 {
     const int region_capacity = MAX_NAMES + 1;
@@ -107,11 +113,12 @@ static int run_countnames_parallel(char *args[], int argc)
         return 1;
     }
 
-    // GLOBAL is laid out as one region per child followed by one summary region.
+    // Make one part for each child and one part for the final result
     memset(global, 0, total_bytes);
     summary_region = (NameCountData *)((char *)global + ((size_t)child_count * region_bytes));
     initialize_region(summary_region, region_capacity);
 
+    // Start all children so they run at the same time.
     for (int i = 0; i < child_count; i++)
     {
         pid_t pid = fork();
@@ -128,7 +135,7 @@ static int run_countnames_parallel(char *args[], int argc)
             char offset_buffer[32];
             size_t offset = (size_t)i * region_bytes;
 
-            // Each child reconnects to GLOBAL and writes only into its assigned subspace.
+            // Tell each child where its part starts
             snprintf(offset_buffer, sizeof(offset_buffer), "%zu", offset);
             execl("./countnames", "./countnames", args[i + 1], "--shm", shm_template, offset_buffer, (char *)NULL);
             perror("exec");
@@ -145,7 +152,7 @@ static int run_countnames_parallel(char *args[], int argc)
             perror("wait");
             status = 1;
         }
-        else if (!WIFEXITED(child_status) || WEXITSTATUS(child_status) != 0)
+        else if (!WIFEXITED(child_status) || WEXITSTATUS(child_status) != 0) // if the child failed, we should fail too.
         {
             status = 1;
         }
@@ -154,7 +161,7 @@ static int run_countnames_parallel(char *args[], int argc)
     for (int i = 0; i < child_count; i++)
     {
         NameCountData *child_region = (NameCountData *)((char *)global + ((size_t)i * region_bytes));
-        // Parent aggregates every child region into the final summary region.
+        // Add each child's results to the final result
         aggregate_child_region(summary_region, region_capacity, child_region);
     }
 
@@ -171,12 +178,13 @@ int main(void)
     char buf[MAXLINE];
 
     printf("%% ");
-    while (fgets(buf, sizeof(buf), stdin) != NULL)
+    while (fgets(buf, sizeof(buf), stdin) != NULL) // Read a line of input and parse it into arguments
     {
         char *args[MAX_ARGS];
         int argc = 0;
         char *token;
 
+        // Remove the trailing newline and split on whitespace
         buf[strcspn(buf, "\n")] = '\0';
         token = strtok(buf, " \t");
 
@@ -193,11 +201,13 @@ int main(void)
             continue;
         }
 
+        // Handle built-in commands here.
         if (strcmp(args[0], "quit") == 0 || strcmp(args[0], "exit") == 0)
         {
             break;
         }
 
+        // If the command is countnames, we want to run our parallel version that uses shared memory. Otherwise, just run it normally
         if (strcmp(args[0], "./countnames") == 0)
         {
             if (argc == 1)
